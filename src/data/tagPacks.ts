@@ -20,7 +20,8 @@ const seeds: [string, string, TagSeed[]][] = [
     ['AI写作', '用 AI 生成或改写文章、文案等文字内容的工具。', 'AI写作|AI 写作|AI文案|ai writing|ai copywriting|ai writer'],
     ['AI绘图', '用 AI 生成或编辑图片、插画的工具。', 'AI绘图|AI绘画|AI 绘画|AI作图|AI生图|文生图|text to image|ai image generator|ai art'],
     ['AI视频', '用 AI 生成或编辑视频的工具。', 'AI视频|AI 视频|文生视频|text to video|ai video'],
-    ['AI编程', '辅助写代码、生成应用或调试程序的 AI 工具。', 'AI编程|AI 编程|代码助手|ai coding|ai code|code assistant|coding agent']
+    ['AI编程', '辅助写代码、生成应用或调试程序的 AI 工具。', 'AI编程|AI 编程|代码助手|ai coding|ai code|code assistant|coding agent'],
+    ['AI技能', '给 AI 智能体扩展能力的资源：Agent Skill（技能）、MCP 服务、提示词库、智能体工作流模板。', 'skill|skills|agent skill|claude skill|mcp|mcp server|提示词库|prompt library|prompts|技能库|智能体', 'skills.sh|skillsmp.com|smithery.ai|mcp.so|glama.ai|modelcontextprotocol.io']
   ]],
   ['research', '科研学术', [
     ['文献检索', '用于查找论文、学术文献或学术索引。', '文献检索|学术搜索|literature search', 'scholar.google.com|pubmed.ncbi.nlm.nih.gov|semanticscholar.org'],

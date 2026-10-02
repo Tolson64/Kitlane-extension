@@ -25,6 +25,8 @@ const GROUPS: Group[] = [
   ['tool', '开源项目', 'jsdelivr.com unpkg.com cdnjs.com'],
   ['tool', '', 'code.visualstudio.com jetbrains.com sublimetext.com neovim.io iterm2.com warp.dev'],
   ['tool', 'AI编程', 'cursor.com windsurf.com codeium.com v0.dev v0.app bolt.new lovable.dev trae.ai trae.cn marscode.cn github.com/features/copilot'],
+  ['tool', 'AI技能', 'skills.sh skillsmp.com smithery.ai mcp.so glama.ai promptbase.com'],
+  ['article', 'AI技能,文档,技术文档', 'modelcontextprotocol.io'],
   ['tool', '模型工具', 'openrouter.ai replicate.com together.ai groq.com modelscope.cn ollama.com lmstudio.ai wandb.ai langchain.com llamaindex.ai dify.ai coze.cn coze.com fireworks.ai aistudio.google.com platform.deepseek.com open.bigmodel.cn bigmodel.cn'],
   ['tool', '模型工具,统计分析', 'colab.research.google.com'],
   ['article', '文章,技术社区', 'juejin.cn csdn.net cnblogs.com segmentfault.com oschina.net dev.to hashnode.com'],

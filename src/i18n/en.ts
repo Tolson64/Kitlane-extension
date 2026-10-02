@@ -283,7 +283,7 @@ export const LABELS_EN: Record<string, string> = {
   '健康家庭': 'Home & health', '兴趣娱乐': 'Hobbies', '投资研究': 'Investing',
   // 标签
   '在线工具': 'Online tool', '文档': 'Docs', '教程': 'Tutorial', '文章': 'Article', '视频': 'Video', '模板': 'Template', '素材': 'Assets',
-  'AI助手': 'AI assistant', 'AI写作': 'AI writing', 'AI绘图': 'AI image', 'AI视频': 'AI video', 'AI编程': 'AI coding',
+  'AI助手': 'AI assistant', 'AI写作': 'AI writing', 'AI绘图': 'AI image', 'AI视频': 'AI video', 'AI编程': 'AI coding', 'AI技能': 'AI skills',
   '文献检索': 'Literature search', '研究方法': 'Methods', '数据集': 'Datasets', '实验工具': 'Lab tools', '学术写作': 'Academic writing', '投稿资源': 'Submission', '论文阅读': 'Papers', '问卷调查': 'Surveys',
   '在线课程': 'Courses', '语言学习': 'Languages', '教材题库': 'Practice', '考试备考': 'Exam prep', '知识笔记': 'Notes', '百科': 'Encyclopedia',
   '技术文档': 'Tech docs', '开源项目': 'Open source', '接口调试': 'API testing', '测试部署': 'Deploy & test', '运维安全': 'Ops & security', '技术社区': 'Dev community',

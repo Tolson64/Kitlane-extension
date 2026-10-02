@@ -13,16 +13,19 @@ Kitlane is built for that moment. It reads the bookmarks already in your browser
 
 ## See it work
 
-Type what you need to do. These come from local search only, with no model and no API key (run on the author's 474-bookmark sample library; the queries are Chinese, shown here in English):
+Type what you need to do. These come from local search only, with no model and no API key (run on the author's 480-bookmark sample library; the queries are Chinese, shown here in English):
 
 | You type | Top results |
 |---|---|
-| formatting for WeChat articles | Xiumi, 135 Editor, mdnice |
-| memorize vocabulary | Shanbay, Duolingo |
+| find skills | SkillsMP, anthropics/skills, skills.sh, Smithery |
+| system design interview material | LeetCode, coding-interview-university, system-design-primer |
+| English research papers | arXiv, SSRN |
+| listed-company financial reports | HKEXnews, SZSE, CNINFO, SEC EDGAR |
+| quant backtesting platform | RiceQuant, Portfolio Visualizer, JoinQuant, QuantConnect |
+| macroeconomic data | FRED, Jin10, World Bank, National Bureau of Statistics |
+| web design inspiration | Dribbble, Behance, Awwwards, Godly |
 | an AI tool for making slides | AiPPT, iSlide, Gamma |
 | collect payments from overseas | PingPong, LianLian Global, Payoneer, Wise |
-| Amazon product research tools | SellerSprite, Jungle Scout, Helium 10 |
-| a site to shrink images | Squoosh, TinyPNG (plus background-removal and photo tools) |
 
 When you want more, click **Smart search** and a model you configured re-ranks the results.
 
@@ -43,7 +46,7 @@ Share of bookmarks left unclassified with no model configured (lower is better):
 | The author's own bookmarks (57) | 78% | **32%** |
 | Top-voted Hacker News and Lobsters links (405, not hand-picked) | 75% | **45%**, or **29%** after reading page descriptions |
 
-For search, 60 everyday-language queries over 474 sample bookmarks: the right bookmark is in the local top 30 **97%** of the time, and in the top 5 **92%** of the time.
+For search, 61 everyday-language queries over 480 sample bookmarks: the right bookmark is in the local top 30 **97%** of the time, and in the top 5 **92%** of the time.
 
 > Caveats: the author's own set is small (57); the sample bookmarks and queries for the search test were written by the author, so those numbers are optimistic and only good for comparing changes over time. Real-user data is still missing. If you can share anonymous aggregate stats, please open an issue.
 

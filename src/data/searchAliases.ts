@@ -58,6 +58,8 @@ export const SEARCH_ALIASES: SearchAlias[] = [
   ['面试|八股', '', '面试准备'],
   ['流程图|思维导图|白板|画架构|diagram', '', '在线工具'],
   ['正则|regex|json|格式化|代码截图', '', '在线工具'],
+  // AI 技能
+  ['skill|skills|技能|mcp|提示词库|prompt库|智能体扩展|agent skill', '', 'AI技能'],
   // AI 助手
   ['聊天|问问题|问ai|ai助手|ai对话|chatbot|问答', 'ai|人工智能|模型|gpt|助手|chat', 'AI助手'],
   ['chatgpt|kimi|豆包|deepseek|通义|文心|claude|gemini', '', 'AI助手'],
