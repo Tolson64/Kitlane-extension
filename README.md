@@ -104,6 +104,8 @@ npm run build:edge     # Edge 输出到 .output/edge-mv3
 
 发现问题，或者有想法，欢迎提 [Issue](https://github.com/Tolson64/Kitlane-extension/issues)，也欢迎 Pull Request 💌
 
+想聊聊、合作，或者有不方便公开说的反馈，可以发邮件 📮 **465260295@qq.com**
+
 <!-- TODO 👋 关于作者，等小红书账号 -->
 
 ## 📄 许可证

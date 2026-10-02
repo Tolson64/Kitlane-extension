@@ -109,6 +109,8 @@ The full list of what counts as private and how data flows is in the [technical 
 
 Found a bug or have an idea? Please open an [issue](https://github.com/Tolson64/Kitlane-extension/issues). Pull requests are welcome.
 
+To chat, collaborate, or share feedback privately, email **465260295@qq.com**.
+
 <!-- TODO: About the author (add after the Xiaohongshu account is provided) -->
 
 ## License
