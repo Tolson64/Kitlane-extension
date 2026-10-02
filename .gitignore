@@ -1,0 +1,10 @@
+node_modules/
+.output/
+.wxt/
+.DS_Store
+*.log
+
+# 内部协作资料，不放进公开仓库（只通过 Drive 发布包交接）
+Agent/
+CLAUDE.md
+releases/

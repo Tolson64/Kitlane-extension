@@ -1,0 +1,5 @@
+{
+  "extName": { "message": "Kitlane – Find Saved Tools by Task" },
+  "extDescription": { "message": "Describe the task, find the tool you saved. Sorts bookmarks without an API key; private links stay on your device." },
+  "actionTitle": { "message": "Open Kitlane side panel" }
+}

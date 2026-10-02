@@ -1,0 +1,5 @@
+{
+  "extName": { "message": "Kitlane - 智能场景书签" },
+  "extDescription": { "message": "用一句话描述要做的事，找回收藏过的工具、开源项目和资料。不填模型 Key 也能自动分类，私密收藏只在本机处理。" },
+  "actionTitle": { "message": "打开 Kitlane 侧边栏" }
+}
