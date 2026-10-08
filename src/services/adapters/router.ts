@@ -5,8 +5,8 @@ function isHost(hostname: string, domain: string): boolean {
   return hostname === domain || hostname.endsWith(`.${domain}`);
 }
 
-// —— 公网上的私人页面：账号后台、个人或团队的文档与文件、公司内部系统 ——
-// 这些页面只在本机处理：不发给模型、不抓取网页；产品官网首页仍按公开处理。
+// —— 公网上的私人页面：账号后台、个人或团队的文档与文件、公司内部系统、能力链接 ——
+// 这些页面只在本机处理：不发给模型、不抓取网页；产品官网首页、普通仓库、文档和博客仍按公开处理。
 // 子域名首段表示后台或账号入口（仅在三段及以上的主机名上生效，避免误伤 grafana.com 这类官网）。
 const ACCOUNT_SUBDOMAINS = new Set(['mail', 'exmail', 'outlook', 'console', 'dashboard', 'dash', 'admin', 'seller', 'sellercentral', 'sellercentral-europe', 'creator', 'analytics', 'tagmanager', 'accounts', 'account', 'myaccount', 'my', 'login', 'signin', 'sso', 'passport', 'portal', 'oa', 'hr', 'erp-admin', 'jwxt', 'vpn', 'intranet', 'internal', 'jenkins', 'grafana', 'kibana', 'jira', 'confluence', 'gitlab', 'git', 'redash', 'metabase', 'superset', 'sentry', 'etax']);
 // 整个主机就是个人后台或文件区。
@@ -36,7 +36,22 @@ const NOTION_PUBLIC = new Set(['product', 'pricing', 'templates', 'help', 'about
 const YUQUE_PUBLIC = new Set(['help', 'about', 'dashboard', 'login', 'register', 'explore', 'download', 'pricing']);
 // 路径前两段出现这些词，多为账号或后台页面。
 const ACCOUNT_PATH_SEGMENTS = new Set(['settings', 'account', 'accounts', 'admin', 'dashboard', 'console', 'my', 'billing', 'inbox', 'cgi-bin', 'portal', 'workspace']);
-const SECRET_QUERY = /^(token|access_token|id_token|key|apikey|api_key|secret|sig|signature|session|sessionid|sid|auth|code|password|passwd|ticket)$/i;
+const SECRET_QUERY = /^(token|access_token|id_token|key|apikey|api_key|secret|sig|signature|session|sessionid|sid|auth|code|password|passwd|ticket|pwd|passcode|reset_token|invite)$/i;
+
+// 能力链接：邀请、分享、重置、验证、魔法链接等，后面跟着难以猜测的令牌。
+// 下划线会先折成连字符再匹配，所以 reset_password 与 reset-password 同一条规则。
+const CAPABILITY_SEGMENTS = new Set([
+  'reset', 'reset-password', 'password-reset', 'forgot-password',
+  'verify', 'verification', 'verify-email', 'email-verification', 'email-verify', 'email-confirm',
+  'confirm', 'confirmation', 'confirm-email',
+  'magic', 'magic-link', 'magic-login', 'login-link', 'sign-in-link', 'signin-link', 'one-time-login',
+  'invite', 'invites', 'invitation', 'invitations', 'shared-invite',
+  'share', 'shares', 'shared',
+  'token', 'tokens', 'redeem', 'redemption', 'unsubscribe',
+  'activate', 'activation', 'recover', 'recovery', 'account-recovery'
+]);
+// 公开代码托管上的提交哈希、仓库名本身是公开内容。秘密 Gist 走单独规则，不在此列。
+const CODE_CONTENT_HOSTS = ['github.com', 'gitlab.com', 'bitbucket.org', 'gitee.com', 'codeberg.org'];
 
 // 成人内容：属于敏感个人信息，默认只在本机处理（用户 2026-10-01 决定）。按域名、专用顶级域名和标题中的明显字样识别。
 const ADULT_DOMAINS = ['pornhub.com', 'xvideos.com', 'xnxx.com', 'xhamster.com', 'redtube.com', 'youporn.com', 'tube8.com', 'spankbang.com', 'eporner.com', 'beeg.com', 'txxx.com', 'hqporner.com', 'motherless.com', 'porn.com', 'onlyfans.com', 'fansly.com', 'chaturbate.com', 'stripchat.com', 'bongacams.com', 'livejasmin.com', 'cam4.com', 'myfreecams.com', 'brazzers.com', 'javlibrary.com', 'javbus.com', 'javdb.com', 'missav.com', 'missav.ws', 'missav.ai', 'jable.tv', 'supjav.com', 'av01.tv', 'thisav.com', '91porn.com', 'hanime.tv', 'nhentai.net', 'e-hentai.org', 'exhentai.org', 'rule34.xxx', '18comic.vip'];
@@ -52,6 +67,160 @@ export function isAdultContent(url: string, title = ''): boolean {
   const text = title.toLowerCase();
   return ADULT_TITLE_CJK.some(word => text.includes(word)) ||
     ADULT_TITLE_WORDS.some(word => new RegExp(`(^|[^a-z0-9])${word}($|[^a-z0-9])`).test(text));
+}
+
+function safeDecode(value: string): string {
+  try { return decodeURIComponent(value); } catch { return value; }
+}
+
+function shannonEntropy(value: string): number {
+  const counts = new Map<string, number>();
+  for (const char of value) counts.set(char, (counts.get(char) || 0) + 1);
+  let entropy = 0;
+  for (const count of counts.values()) {
+    const p = count / value.length;
+    entropy -= p * Math.log2(p);
+  }
+  return entropy;
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
+function looksLikeJwt(value: string): boolean {
+  return /^eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}$/.test(value);
+}
+
+// 博客、文档、标题式路径：word-word、2024-guide，或 word-word-<短 id>（Medium、Dev.to 一类）。
+function isHumanSlug(value: string): boolean {
+  const pieces = value.split(/[-_]/).filter(Boolean);
+  if (pieces.length < 2) return false;
+  const word = (piece: string) => /^[a-z]{2,24}$/i.test(piece);
+  const plain = (piece: string) => word(piece) || /^(?:19|20)\d{2}$/.test(piece) || /^\d{1,4}$/.test(piece);
+  if (pieces.every(plain) && pieces.some(word)) return true;
+  const words = pieces.filter(word);
+  if (words.length < 2 || words.length < pieces.length - 1) return false;
+  const extras = pieces.filter(piece => !word(piece));
+  return extras.length === 1 && /^[a-z0-9]{1,16}$/i.test(extras[0]);
+}
+
+function isDictionaryWord(value: string): boolean {
+  return /^[a-z]{2,24}$/i.test(value);
+}
+
+function isVersion(value: string): boolean {
+  return /^v?\d{1,4}(?:\.\d+){1,3}$/i.test(value);
+}
+
+function isDate(value: string): boolean {
+  return /^(?:19|20)\d{2}(?:-\d{2}){1,2}$/.test(value);
+}
+
+// photo2024、es2020guide 这类带年份的普通词，不是令牌。
+function isYearish(value: string): boolean {
+  const stripped = value.replace(/(?:19|20)\d{2}/gi, '');
+  return stripped !== value && /^[a-z]*$/i.test(stripped);
+}
+
+function isCamelPhrase(value: string): boolean {
+  if (!/[a-z]/.test(value) || !/[A-Z]/.test(value) || /\d/.test(value)) return false;
+  const pieces = value.split(/(?=[A-Z])/).filter(Boolean);
+  return pieces.length >= 2 && pieces.every(piece => /^[A-Z][a-z]{2,}$/.test(piece) || /^[A-Z]{2,}$/.test(piece));
+}
+
+function isCapabilitySegment(segment: string): boolean {
+  return CAPABILITY_SEGMENTS.has(segment.toLowerCase().replace(/_/g, '-'));
+}
+
+// 紧跟在 invite/share/reset/verify 等词后面的一段。短码只在已知产品上单独识别。
+function looksLikeCapabilityToken(raw: string): boolean {
+  const value = safeDecode(raw);
+  if (!value || isHumanSlug(value) || isDictionaryWord(value) || isVersion(value) || isDate(value)) return false;
+  if (value.length < 8 || value.length > 512) return false;
+  if (looksLikeJwt(value) || isUuid(value)) return true;
+  if (!/^[A-Za-z0-9._~+/-]+$/.test(value)) return false;
+  if (/^[0-9a-f]{10,}$/i.test(value)) return true;
+  if (isYearish(value) || isCamelPhrase(value)) return false;
+  if (/\d/.test(value) && /[a-z]/i.test(value) && value.length >= 10) return true;
+  if (/[a-z]/.test(value) && /[A-Z]/.test(value) && value.length >= 12 && shannonEntropy(value) >= 3) return true;
+  if (/^\d{16,}$/.test(value)) return true;
+  return false;
+}
+
+// 没有敏感词时，只把整段都像密钥的路径当成私密：UUID、JWT、长十六进制、高熵令牌。
+// 普通英文单词、带连字符的标题、纯数字（社交帖子 id）不在此列。
+function looksLikeHighEntropySecret(raw: string): boolean {
+  const value = safeDecode(raw);
+  if (!value || isHumanSlug(value)) return false;
+  if (looksLikeJwt(value) || isUuid(value)) return true;
+  if (value.includes('.') || value.length < 22 || value.length > 256) return false;
+  if (!/^[A-Za-z0-9_-]+$/.test(value) || isCamelPhrase(value) || /^\d+$/.test(value)) return false;
+  if (value.includes('-') || value.includes('_')) {
+    if (value.split(/[-_]/).some(piece => /^[a-z]{4,}$/i.test(piece))) return false;
+  }
+  if (/^[0-9a-f]{32,}$/i.test(value) && /\d/.test(value) && /[a-f]/i.test(value)) return true;
+  const classes = Number(/[a-z]/.test(value)) + Number(/[A-Z]/.test(value)) + Number(/\d/.test(value));
+  if (classes < 2 || !(/\d/.test(value) || (/[a-z]/.test(value) && /[A-Z]/.test(value)))) return false;
+  return shannonEntropy(value) >= 3.3;
+}
+
+function isCodeContentHost(host: string): boolean {
+  if (host === 'gist.github.com') return false;
+  return CODE_CONTENT_HOSTS.some(domain => isHost(host, domain));
+}
+
+function isZoomHost(host: string): boolean {
+  return ['zoom.us', 'zoom.com', 'zoomgov.com', 'zoom.com.cn'].some(domain => isHost(host, domain));
+}
+
+// 产品本身的秘密链接：从网址看不出公开还是私密，路径会泄露访问能力，一律只留在本机。
+function isKnownSecretLink(host: string, parts: string[]): boolean {
+  const head = (parts[0] || '').toLowerCase();
+  if (host === 'gist.github.com' && (parts.length >= 2 || (parts.length === 1 && looksLikeHighEntropySecret(parts[0])))) return true;
+  if (host === 'discord.gg' && head.length >= 2) return true;
+  if ((host === 'discord.com' || host.endsWith('.discord.com') || host === 'discordapp.com' || host.endsWith('.discordapp.com')) &&
+    (head === 'invite' || head === 'invites') && parts.length >= 2) return true;
+  if (host === 't.me' || host === 'telegram.me' || host === 'telegram.dog') {
+    if (parts[0]?.startsWith('+')) return true;
+    if ((head === 'joinchat' || head === 'c') && parts.length >= 2) return true;
+  }
+  if (isZoomHost(host)) {
+    if (['j', 's', 'w', 'my'].includes(head) && parts[1]) return true;
+    if (head === 'wc' && ['join', 'j'].includes((parts[1] || '').toLowerCase()) && parts[2]) return true;
+  }
+  if (host === 'we.tl' && parts.length >= 1) return true;
+  if ((host === 'wetransfer.com' || host.endsWith('.wetransfer.com')) && head === 'downloads' && parts.length >= 2) return true;
+  if ((host === 'chatgpt.com' || host === 'chat.openai.com') && (head === 'share' || head === 'c') && parts.length >= 2) return true;
+  if (host === 'claude.ai' && (head === 'share' || head === 'chat') && parts.length >= 2) return true;
+  return false;
+}
+
+function hasCapabilityToken(parts: string[], minIndex: number): boolean {
+  for (let i = minIndex; i < parts.length - 1; i++) {
+    if (isCapabilitySegment(parts[i]) && looksLikeCapabilityToken(parts[i + 1])) return true;
+  }
+  return false;
+}
+
+function isCapabilityUrl(parsed: URL, host: string): boolean {
+  const parts = parsed.pathname.split('/').filter(Boolean).map(safeDecode);
+  if (isKnownSecretLink(host, parts)) return true;
+  // 代码托管的前两段是所有者和仓库名，仓库叫 reset-password 仍按公开处理。
+  if (hasCapabilityToken(parts, isCodeContentHost(host) ? 2 : 0)) return true;
+  if (!isCodeContentHost(host) && parts.some(looksLikeHighEntropySecret)) return true;
+  return false;
+}
+
+function hasSecretParams(params: URLSearchParams): boolean {
+  return [...params.keys()].some(key => SECRET_QUERY.test(key));
+}
+
+function hasSecretFragment(hash: string): boolean {
+  const raw = hash.startsWith('#') ? hash.slice(1) : hash;
+  if (!raw) return false;
+  if (looksLikeJwt(raw) || looksLikeHighEntropySecret(raw)) return true;
+  return raw.includes('=') && hasSecretParams(new URLSearchParams(raw));
 }
 
 // 是否只在本机处理（不发给任何模型、不抓取网页）：用户标记的私密、私密网址规则、成人内容、读取时发现需要登录。
@@ -76,7 +245,9 @@ function isAccountOrPrivateContent(parsed: URL, hostname: string): boolean {
   if (isHost(host, 'notion.so') && parts.length >= 1 && !NOTION_PUBLIC.has(parts[0])) return true;
   if (isHost(host, 'yuque.com') && parts.length >= 2 && !YUQUE_PUBLIC.has(parts[0])) return true;
   if (parts.slice(0, 2).some(p => ACCOUNT_PATH_SEGMENTS.has(p))) return true;
-  return [...parsed.searchParams.keys()].some(key => SECRET_QUERY.test(key));
+  if (hasSecretParams(parsed.searchParams) || hasSecretFragment(parsed.hash)) return true;
+  if (isCapabilityUrl(parsed, host)) return true;
+  return false;
 }
 
 /**

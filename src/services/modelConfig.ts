@@ -77,14 +77,21 @@ export function chatResponseFormat(settings: AppSettings, schema: Record<string,
     : { type: 'json_object' };
 }
 
+// 模型接口、本机地址都是可选主机权限，保存时按实际地址申请。端口不写入匹配模式。
+export function modelHostPermissionOrigin(endpoint: URL): string {
+  return `${endpoint.protocol}//${endpoint.hostname}/*`;
+}
+
 // Called directly from Save's click handler, before any unrelated await, to retain the user gesture.
 export async function requestModelHostAccess(settings: AppSettings): Promise<void> {
-  if (!settings.allowRemoteEnrichment || settings.modelProvider === 'laya_local') return;
-  const { endpoint } = getSmartSearchConfig(settings);
-  const declaredHosts = ['api.deepseek.com', 'open.bigmodel.cn', 'api.typesafe.ai'];
-  if ((endpoint.protocol === 'http:' && isLoopback(endpoint)) || (endpoint.protocol === 'https:' && declaredHosts.includes(endpoint.hostname))) return;
-  if (typeof chrome === 'undefined' || !chrome.permissions?.request) throw new Error(t('请在浏览器扩展中保存设置，以授权所填接口域名'));
+  if (!settings.allowRemoteEnrichment) return;
+  const endpoint = settings.modelProvider === 'laya_local'
+    ? (usesLocalModelEndpoint(settings) ? new URL(settings.baseUrl.trim()) : null)
+    : getSmartSearchConfig(settings).endpoint;
+  if (!endpoint) return;
+  const browser = (globalThis as { chrome?: typeof chrome }).chrome;
+  if (!browser?.permissions?.request) throw new Error(t('请在浏览器扩展中保存设置，以授权所填接口域名'));
   // Match patterns apply to the host; never grant all HTTPS hosts at once.
-  const granted = await chrome.permissions.request({ origins: [`https://${endpoint.hostname}/*`] });
+  const granted = await browser.permissions.request({ origins: [modelHostPermissionOrigin(endpoint)] });
   if (!granted) throw new Error(t('未授权该接口域名，设置未保存；关键词搜索仍可使用'));
 }

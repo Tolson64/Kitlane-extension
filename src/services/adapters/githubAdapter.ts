@@ -8,6 +8,19 @@ export interface GitHubMeta {
   readmeSnippet: string;
 }
 
+export const GITHUB_API_ORIGINS = ['https://api.github.com/*', 'https://raw.githubusercontent.com/*'];
+
+// 只有会去拉 README 的公开仓库才需要这两个可选主机权限。
+export function githubApiOriginsFor(assets: { url: string; assetType?: string }[]): string[] {
+  return assets.some(asset => asset.assetType === 'repo' && parseGitHubUrl(asset.url)) ? GITHUB_API_ORIGINS : [];
+}
+
+async function canFetchGitHub(): Promise<boolean> {
+  const browser = (globalThis as { chrome?: typeof chrome }).chrome;
+  if (!browser?.permissions?.contains) return true;
+  try { return await browser.permissions.contains({ origins: [...GITHUB_API_ORIGINS] }); } catch { return false; }
+}
+
 export function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
   try {
     const u = new URL(url);
@@ -26,6 +39,9 @@ export async function fetchGitHubInfo(owner: string, repo: string): Promise<GitH
   let language = '';
   let stars = 0;
   let readmeSnippet = '';
+
+  // 未授权时安静跳过：自动分析没有点击手势，不能在这里弹权限；调用方在点击时已经申请过。
+  if (!(await canFetchGitHub())) return { owner, repo, description, topics, language, stars, readmeSnippet };
 
   try {
     // 1. 获取基础仓库信息

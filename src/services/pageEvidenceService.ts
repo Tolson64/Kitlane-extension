@@ -45,8 +45,12 @@ export async function permittedForEvidence(assets: Asset[]): Promise<Asset[]> {
 }
 
 // Call directly from the click/Enter handler, before awaiting anything, to retain the user gesture.
-export function requestPageEvidenceAccess(assets: Asset[]): Promise<boolean> {
-  const origins = [...new Set(assets.filter(asset => needsPageEvidence(asset)).map(asset => permissionOrigin(pageEvidenceUrl(asset)!)))];
+// extraOrigins 合并进同一次申请（例如 GitHub API），一次点击只能弹一次权限框。
+export function requestPageEvidenceAccess(assets: Asset[], extraOrigins: string[] = []): Promise<boolean> {
+  const origins = [...new Set([
+    ...assets.filter(asset => needsPageEvidence(asset)).map(asset => permissionOrigin(pageEvidenceUrl(asset)!)),
+    ...extraOrigins
+  ])];
   if (!origins.length) return Promise.resolve(true);
   try { return chrome.permissions.request({ origins }).catch(() => false); } catch { return Promise.resolve(false); }
 }

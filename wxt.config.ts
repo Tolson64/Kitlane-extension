@@ -16,20 +16,21 @@ export default defineConfig({
     },
     permissions: [
       'bookmarks',
-      'storage',
       'sidePanel',
       'favicon'
     ],
-    host_permissions: [
+    // 模型接口、本机地址和 GitHub API 多数用户用不到，安装时不授予；保存设置或分析仓库时再申请。
+    // https://*/* 只表示可以按网站逐个申请，不会一次授予全部网站。
+    optional_host_permissions: [
+      'https://*/*',
+      'http://localhost/*',
+      'http://127.0.0.1/*',
       'https://api.github.com/*',
       'https://raw.githubusercontent.com/*',
       'https://api.deepseek.com/*',
       'https://open.bigmodel.cn/*',
-      'https://api.typesafe.ai/*',
-      'http://localhost/*',
-      'http://127.0.0.1/*'
+      'https://api.typesafe.ai/*'
     ],
-    optional_host_permissions: ['https://*/*'],
     side_panel: {
       default_path: 'sidepanel/index.html'
     },

@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+隐私
+- 秘密 Gist、Discord / Telegram 邀请、Zoom 会议、WeTransfer、ChatGPT / Claude 分享，以及重置、验证、魔法链接和路径中的高熵密钥，改为只在本机处理。普通仓库、文档和博客仍按公开处理。
+- 去掉未使用的 `storage` 权限。模型接口、本机地址和 GitHub API 改为可选主机权限：保存模型设置时申请接口域名，分析 GitHub 仓库时申请 GitHub API。
+
+开发
+- 增加 Vitest 与 `npm test`，覆盖私密链接分类；GitHub Actions 运行编译、测试和构建。
+
 ## 1.1.0 (2026-10-02)
 
 中英双语与国际化
