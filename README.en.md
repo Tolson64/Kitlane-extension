@@ -35,7 +35,7 @@ When you want more, click **Smart search** and a model you configured re-ranks t
 - **Search by task, not by name.** Local search maps everyday phrasing to tags ("remove background" → image editing, "annual report" → filings). Optional smart search picks the top 30 candidates locally, then asks your model to re-rank them.
 - **Collections that follow your tags.** A collection includes every bookmark carrying its tags, so it gets better as tagging gets better. New collections get tags suggested from their names.
 - **Bring your own model, optional.** Any OpenAI-compatible API, cloud or local (Ollama, LM Studio), or the Jev decision model. A language model can summarize bookmarks, choose tags from your tag library and judge collection rules.
-- **Private stays on your device.** Internal tools, online documents, account consoles, file shares, links with credentials, adult content, and pages that turn out to require login are never sent to a model and never fetched.
+- **Private stays on your device.** Internal tools, online documents, account consoles, file shares, invite and share links, links with credentials or secret path tokens, adult content, and pages that turn out to require login are never sent to a model and never fetched.
 
 ## Measured results
 

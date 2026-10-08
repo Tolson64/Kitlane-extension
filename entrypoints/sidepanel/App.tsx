@@ -13,7 +13,7 @@ import { OrganizeAssetModal } from '../../src/components/OrganizeAssetModal';
 import { Asset, AssetType, AppSettings, DEFAULT_SETTINGS, USE_STATUS_LABELS } from '../../src/types/domain';
 import { detectAssetType, isLocalOnly } from '../../src/services/adapters/router';
 import { enrichPrivateAsset } from '../../src/services/adapters/privateSafeAdapter';
-import { parseGitHubUrl, fetchGitHubInfo } from '../../src/services/adapters/githubAdapter';
+import { parseGitHubUrl, fetchGitHubInfo, githubApiOriginsFor } from '../../src/services/adapters/githubAdapter';
 import { analyzeWithModel } from '../../src/services/aiService';
 import { belongsToCollection, classifyLibrary, effectiveTags, evidenceText, hasUncertainCollection, needsModelAnalysis } from '../../src/services/classification';
 import { classifyWithJev, uncachedDecisionLibrary, type JevResult } from '../../src/services/jevService';
@@ -370,7 +370,8 @@ export const App: React.FC = () => {
   };
 
   const handleUpdateAll = () => {
-    void startModelUpdate(requestPageEvidenceAccess(assets.filter(a => needsModelAnalysis(a, modelFingerprint(settingsRef.current), collectionsForModel(settingsRef.current)))));
+    const targets = assets.filter(a => needsModelAnalysis(a, modelFingerprint(settingsRef.current), collectionsForModel(settingsRef.current)));
+    void startModelUpdate(requestPageEvidenceAccess(targets, githubApiOriginsFor(targets)));
   };
 
   const stopModelUpdate = () => {
@@ -385,7 +386,7 @@ export const App: React.FC = () => {
     const evidenceTargets = evidenceDeclined ? [] : assets.filter(a => needsPageEvidence(a));
     const modelTargets = ready ? assets.filter(a => needsModelAnalysis(a, modelFingerprint(settingsRef.current), collectionsForModel(settingsRef.current))) : [];
     // 一次授权同时用于读取网页简介和模型更新；须在任何 await 之前调用。
-    const permission = requestPageEvidenceAccess([...evidenceTargets, ...modelTargets]);
+    const permission = requestPageEvidenceAccess([...evidenceTargets, ...modelTargets], githubApiOriginsFor(modelTargets));
     await handleSyncBookmarks();
     void runPageEvidence(await db.assets.toArray(), permission);
     if (ready) await startModelUpdate(permission);
@@ -518,7 +519,7 @@ export const App: React.FC = () => {
     if (classificationRunning.current) return;
     if (asset.enrichmentStatus === 'processing') return;
     try {
-      if (modelIsReady(settings)) await requestPageEvidenceAccess([asset]);
+      if (modelIsReady(settings)) await requestPageEvidenceAccess([asset], githubApiOriginsFor([asset]));
       await enrichSingleAsset(asset, settings);
     } catch (error) {
       const current = await db.assets.get(asset.id);
