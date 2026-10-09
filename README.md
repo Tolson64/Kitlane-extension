@@ -129,8 +129,6 @@ npm run build:edge     # Edge 输出到 .output/edge-mv3
 
 欢迎在小红书关注「Tolson在叭叭」，分享 AI × 医疗 和小工具。
 
-小红书号：9482664180
-
 <p align="center">
   <img src="assets/xiaohongshu-qr.jpg" alt="Tolson在叭叭 的小红书名片" width="280" />
 </p>
