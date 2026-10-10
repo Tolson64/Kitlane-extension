@@ -111,7 +111,7 @@ The [technical notes](docs/technical-notes.zh.md) go further (Chinese).
 
 Found a problem, or have an idea? Open an [issue](https://github.com/Tolson64/Kitlane-extension/issues). Pull requests are welcome.
 
-For a chat, a collaboration, or feedback you would rather not post in public, email **465260295@qq.com**.
+For a chat, a collaboration, or feedback you would rather not post in public, email **taopatric58@gmail.com**.
 
 ## License
 
