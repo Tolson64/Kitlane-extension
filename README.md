@@ -18,6 +18,14 @@
 
 不用整理的收藏夹，也不动你的文件夹，Kitlane 只是读一遍你已有的收藏，按用途打好标签。你说一句「把图片弄小的网站」，它把那一个翻出来 🎯
 
+<p align="center">
+  <a href="assets/kitlane-demo.mp4">
+    <img src="assets/kitlane-demo-preview.gif" alt="Kitlane 侧边栏演示" width="300" />
+  </a>
+  <br />
+  <a href="assets/kitlane-demo.mp4">▶ 点击观看 40 秒完整演示</a>
+</p>
+
 ## 🔍 先试试
 
 下面全是纯本地搜出来的，没用模型，也没填 Key 👇
