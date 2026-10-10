@@ -11,11 +11,7 @@ A few hundred links, saved because they looked useful later. When later arrives,
 Kitlane is for people who would rather not tidy. It leaves your folders alone. It reads the bookmarks you already have, tags each one by what it is for, and pulls up the right one when you type something like "a site that shrinks images."
 
 <p align="center">
-  <a href="assets/kitlane-demo.mp4">
-    <img src="assets/kitlane-demo-preview.gif" alt="Kitlane side panel demo" width="300" />
-  </a>
-  <br />
-  <a href="assets/kitlane-demo.mp4">▶ Watch the 40-second demo</a>
+  <img src="assets/kitlane-demo-preview.gif" alt="Kitlane side panel demo" width="300" />
 </p>
 
 ## Try it
